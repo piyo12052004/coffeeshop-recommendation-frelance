@@ -135,7 +135,9 @@ def get_recommendations(rating="", area="", harga="", fasilitas="", top_n=5):
     try:
         # 1. Ambil data
         db = mysql.connector.connect(
-            host="localhost", user="root", password="", database="coffeeshop_project"
+            # host="localhost", user="root", password="", database="coffeeshop_project"
+            # production
+             host="mysql-aset", user="root", password="root123", database="coffeeshop_project"
         )
         df = pd.read_sql(
             "SELECT *, ROUND(rating, 1) AS rating_rounded FROM coffeeshops", db

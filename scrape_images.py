@@ -6,10 +6,15 @@ import mysql.connector
 import time
 
 conn = mysql.connector.connect(
-    host='localhost',
-    user='root',
-    password='',
-    database='coffeeshop_project'
+    # host='localhost',
+    # user='root',
+    # password='',
+    # database='coffeeshop_project'
+    # production
+    host="mysql-aset",
+    user="root",
+    password="root123",
+    database="coffeeshop_project"
 )
 cursor = conn.cursor()
 

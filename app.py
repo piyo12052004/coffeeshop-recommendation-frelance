@@ -17,7 +17,9 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = "coffee_secret"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/coffeeshop_project'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/coffeeshop_project'
+# production
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root123@mysql-aset:3306/coffeeshop_project'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Konfigurasi upload gambar menu
@@ -895,5 +897,9 @@ def admin_profil():
 
 # if __name__ == '__main__':
 #     app.run(debug=True, use_reloader=False)
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
+if __name__ == "__main__":
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        debug=True
+    )
