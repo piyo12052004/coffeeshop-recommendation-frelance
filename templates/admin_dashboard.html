@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — CoffeeHunter</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+    html { font-size: 24px; }
+
+    body { background-color: #f8f4f1; }
+
+    .admin-sidebar {
+        background-color: #21150b;
+        min-height: 100vh;
+        padding: 24px 0;
+        position: sticky;
+        top: 0;
+    }
+    .admin-sidebar .brand {
+        padding: 0 24px 28px 24px;
+        border-bottom: 1px solid #3a2518;
+        margin-bottom: 20px;
+    }
+    .brand-logo { font-size: 2rem; }   
+    .brand-title { font-size: 1.35rem; } 
+    .brand-sub {
+        color: #ad957f;
+        font-size: 1rem;
+        letter-spacing: 1px;
+    }
+    .admin-nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 24px;
+        color: #a89180;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-left: 3px solid transparent;
+        transition: background 0.15s;
+    }
+    .admin-nav-link:hover {
+        background: rgba(255,255,255,0.04);
+        color: #dbccbe;
+    }
+    .admin-nav-link.active {
+        background: rgba(219,204,190,0.08);
+        color: #dbccbe;
+        border-left-color: #dbccbe;
+    }
+    .admin-nav-link i {
+        width: 22px;
+        text-align: center;
+        flex-shrink: 0;
+        margin-right: 12px;
+    }
+
+        /* TOP BAR */
+        .admin-topbar {
+            background: white;
+            padding: 20px 36px;
+            border-bottom: 1px solid #e8ddd4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-topbar h5 { font-size: 1.2rem; }
+        .admin-topbar p  { font-size: 0.9rem; }
+
+        /* STAT CARD */
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 26px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        .stat-card .num {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #21150b;
+        }
+        .stat-card .label {
+            color: #a89180;
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+        .stat-card .icon-box {
+            width: 54px; height: 54px;
+            border-radius: 14px;
+            background: #f0e6da;
+            display: flex; align-items: center; justify-content: center;
+            color: #5C4033;
+            font-size: 1.35rem;
+            flex-shrink: 0;
+        }
+
+        /* CONTENT CARD */
+        .content-card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        .content-card h6 {
+            font-size: 2rem;
+        }
+
+        /* TABLE */
+        .table-admin thead th {
+            color: #a89180;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            border-bottom: 2px solid #f0e6da;
+            padding: 12px 14px;
+        }
+        .table-admin tbody td {
+            padding: 14px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f5f0ea;
+            font-size: 0.95rem;
+        }
+        .table-admin tbody tr:hover { background: #faf6f2; }
+
+        /* CAFE THUMBNAIL */
+        .cafe-thumb {
+            width: 70px; height: 70px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        /* ACTION BUTTONS */
+        .btn-kelola-menu {
+            background-color: #5C4033;
+            color: white;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 12px 22px;
+            border-radius: 50px;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-kelola-menu:hover { background-color: #4a3228; color: white; }
+
+        .btn-edit {
+            background: #f0e6da;
+            color: #5C4033;
+            border: none;
+            border-radius: 8px;
+            width: 36px; height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;      /* ← tidak boleh mengecil */
+            text-decoration: none;
+        }
+        .btn-edit:hover { background: #e4d5c5; color: #5C4033; }
+        
+        .btn-hapus-cafe {
+            background: #fdecea;
+            color: #c62828;
+            border: none;
+            border-radius: 8px;
+            width: 36px; height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .btn-hapus-cafe:hover { background: #f8d7da; color: #a51c1c; }
+
+        .modal-content  { border-radius: 16px; border: none; }
+        .modal-header   { background: #f8f4f1; border-bottom: 1px solid #e8ddd4; border-radius: 16px 16px 0 0; }
+        .modal-title    { font-size: 1.05rem; font-weight: 700; color: #21150b; }
+        .btn-confirm-hapus {
+            background: #c62828; color: #fff; border: none;
+            border-radius: 50px; font-size: 0.92rem; font-weight: 600; padding: 8px 18px;
+        }
+        .btn-confirm-hapus:hover { background: #b71c1c; color: #fff; }
+        .btn-batal {
+            background: #f0e6da; color: #5C4033; border: none;
+            border-radius: 50px; font-size: 0.92rem; font-weight: 600; padding: 8px 16px;
+        }
+        /* SEARCH INPUT */
+        .search-input {
+            padding-left: 42px;
+            font-size: 1.1rem;     
+            width: 350px;        
+            border-color: #e8ddd4;
+            height: 42px;       
+        }
+        .search-icon {
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a89180;
+            font-size: 1rem; 
+        }
+
+
+        /* TOPBAR USER CHIP */
+        .topbar-username {
+            color: #5C4033;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid p-0">
+    <div class="row g-0">
+
+        <!-- ══════════ SIDEBAR ══════════ -->
+        <div class="col-md-3 col-lg-2 admin-sidebar">
+            <div class="brand">
+                <a href="/" class="text-decoration-none d-flex align-items-center gap-2">
+                    <span class="brand-logo">☕</span>
+                    <span class="fw-bold brand-title">
+                        <span style="color:#dbccbe;">Coffee</span><span class="text-white">Hunter.</span>
+                    </span>
+                </a>
+                <p class="mb-0 mt-1 brand-sub">ADMIN PANEL</p>
+            </div>
+            <nav class="d-flex flex-column">
+                <a href="/admin" class="admin-nav-link active">
+                    <i class="fa-solid fa-gauge"></i> Dashboard
+                </a>
+                <a href="/admin/cafe/tambah" class="admin-nav-link">
+                    <i class="fa-solid fa-plus"></i> Tambah Cafe
+                </a>
+                <a href="/admin/users" class="admin-nav-link">
+                    <i class="fa-solid fa-users"></i> Kelola User
+                </a>
+                <a href="/admin/profil" class="admin-nav-link">
+                    <i class="fa-solid fa-user-gear"></i> Pengaturan Profil
+                </a>
+                <a href="/" class="admin-nav-link mt-3" style="border-top: 1px solid #3a2518; padding-top: 16px;">
+                    <i class="fa-solid fa-arrow-left"></i> Kembali ke Situs
+                </a>
+            </nav>
+        </div>
+
+        <!-- ══════════ MAIN ══════════ -->
+        <div class="col-md-9 col-lg-10">
+
+            <!-- Top bar -->
+            <div class="admin-topbar">
+                <div>
+                    <h5 class="fw-bold mb-0" style="color:#21150b;">Dashboard</h5>
+                    <p class="mb-0" style="color:#a89180;">Ringkasan data CoffeeHunter</p>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="topbar-username">{{ session.username }}</span>
+                    <a href="/logout" class="btn btn-sm btn-outline-secondary rounded-pill">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="p-4">
+
+                <!-- STATS -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="stat-card d-flex align-items-center gap-3">
+                            <div class="icon-box"><i class="fa-solid fa-mug-hot"></i></div>
+                            <div>
+                                <div class="num">{{ total_cafe }}</div>
+                                <div class="label">Coffee Shop Terdaftar</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card d-flex align-items-center gap-3">
+                            <div class="icon-box"><i class="fa-solid fa-users"></i></div>
+                            <div>
+                                <div class="num">{{ total_user }}</div>
+                                <div class="label">User Terdaftar</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABEL CAFE -->
+                <div class="content-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h6 class="fw-bold mb-0" style="color:#21150b;">Daftar Coffee Shop</h6>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="position-relative">
+                                <i class="fa-solid fa-magnifying-glass position-absolute search-icon"></i>
+                                <input type="text" id="searchCafeAdmin"
+                                    class="form-control rounded-pill search-input"
+                                    placeholder="Cari nama atau area...">
+                            </div>
+                            <a href="/admin/cafe/tambah" class="btn btn-kelola-menu text-nowrap">
+                                <i class="fa-solid fa-plus me-1"></i> Tambah Cafe
+                            </a>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-admin mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Logo</th>
+                                    <th>Nama</th>
+                                    <th>Area</th>
+                                    <th>Rating</th>
+                                    <th>Website</th>
+                                    <th class="text-end">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cafe in coffeeshops %}
+                                <tr class="cafe-row" data-nama="{{ cafe.nama|lower }}" data-area="{{ cafe.area|lower }}">
+                                    <td>
+                                        <img src="{{ cafe.image_url if cafe.image_url else 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085' }}"
+                                             class="cafe-thumb" alt="{{ cafe.nama }}"
+                                             onerror="this.src='https://images.unsplash.com/photo-1495474472287-4d71bcdd2085'">
+                                    </td>
+                                    <td class="fw-semibold" style="color:#21150b;">{{ cafe.nama }}</td>
+                                    <td style="color:#7a6757;">{{ cafe.area }}</td>
+                                    <td>⭐ {{ cafe.rating }}</td>
+                                    <td>
+                                        {% if cafe.website %}
+                                        <span class="badge rounded-pill" style="background:#e8f5e9; color:#2e7d32; font-weight:600; font-size:0.78rem;">Punya Web</span>
+                                        {% else %}
+                                        <span class="badge rounded-pill" style="background:#f0e6da; color:#7a6757; font-weight:600; font-size:0.78rem;">Belum Ada</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="white-space: nowrap; text-align: right;">
+                                        <div style="display: inline-flex; align-items: center; gap: 6px; justify-content: flex-end;">
+                                            <a href="/admin/cafe/{{ cafe.id }}/edit" class="btn-edit" title="Edit">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+                                            <button type="button"
+                                                    class="btn-hapus-cafe"
+                                                    title="Hapus"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalHapusCafe"
+                                                    data-cafeid="{{ cafe.id }}"
+                                                    data-cafenama="{{ cafe.nama }}">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                            {% if not cafe.website %}
+                                            <a href="/admin/cafe/{{ cafe.id }}/menu" class="btn-kelola-menu">
+                                                <i class="fa-solid fa-image me-1"></i>Kelola Menu
+                                            </a>
+                                            {% else %}
+                                            <span style="color:#cbbfb3; font-size:0.82rem;">— (punya web sendiri)</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4" style="color:#a89180;">Belum ada coffee shop terdaftar.</td>
+                                </tr>
+                                {% endfor %}
+                                <tr id="noResultRow" style="display:none;">
+                                    <td colspan="6" class="text-center py-4" style="color:#a89180;">☕ Tidak ditemukan.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div><!-- /p-4 -->
+        </div><!-- /col main -->
+    </div>
+</div>
+
+<!-- MODAL KONFIRMASI HAPUS CAFE -->
+<div class="modal fade" id="modalHapusCafe" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa-solid fa-triangle-exclamation me-1" style="color:#c62828;"></i> Hapus Coffee Shop
+                </h5>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="font-size:0.92rem; color:#444; padding:1.2rem 1.3rem;">
+                Yakin hapus <strong id="hapusCafeNama"></strong>?
+                <br><span style="font-size:0.85rem; color:#a89180;">Semua foto menu dan bookmark terkait cafe ini juga akan terhapus permanen.</span>
+            </div>
+            <div class="modal-footer" style="border-top:1px solid #e8ddd4; gap:8px;">
+                <button type="button" class="btn-batal" data-bs-dismiss="modal">Batal</button>
+                <form id="formHapusCafe" method="POST" action="">
+                    <button type="submit" class="btn-confirm-hapus">
+                        <i class="fa-solid fa-trash me-1"></i> Hapus
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+const searchCafeAdmin = document.getElementById('searchCafeAdmin');
+const cafeRows = document.querySelectorAll('.cafe-row');
+const noResultRow = document.getElementById('noResultRow');
+
+searchCafeAdmin.addEventListener('input', function () {
+    const keyword = this.value.toLowerCase().trim();
+    let visibleCount = 0;
+    cafeRows.forEach(row => {
+        const match = row.dataset.nama.includes(keyword) || row.dataset.area.includes(keyword);
+        row.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+    });
+    noResultRow.style.display = (visibleCount === 0) ? '' : 'none';
+});
+document.getElementById('modalHapusCafe').addEventListener('show.bs.modal', function (e) {
+    const btn = e.relatedTarget;
+    document.getElementById('hapusCafeNama').textContent = btn.dataset.cafenama;
+    document.getElementById('formHapusCafe').action = `/admin/cafe/${btn.dataset.cafeid}/hapus`;
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Menu — {{ coffee.nama }} — CoffeeHunter</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        html { font-size: 24px; }
+
+        body { background-color: #f8f4f1; }
+
+        /* SIDEBAR — identik dengan admin_dashboard.html */
+        .admin-sidebar {
+            background-color: #21150b;
+            min-height: 100vh;
+            padding: 24px 0;
+            position: sticky;
+            top: 0;
+        }
+        .admin-sidebar .brand {
+            padding: 0 24px 28px 24px;
+            border-bottom: 1px solid #3a2518;
+            margin-bottom: 20px;
+        }
+        .brand-logo { font-size: 2rem; }
+        .brand-title { font-size: 1.35rem; }
+        .brand-sub {
+            color: #ad957f;
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+        .admin-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 24px;
+            color: #a89180;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            transition: background 0.15s;
+        }
+        .admin-nav-link:hover { background: rgba(255,255,255,0.04); color: #dbccbe; }
+        .admin-nav-link.active {
+            background: rgba(219,204,190,0.08);
+            color: #dbccbe;
+            border-left-color: #dbccbe;
+        }
+        .admin-nav-link i {
+            width: 22px;
+            text-align: center;
+            flex-shrink: 0;
+            margin-right: 12px;
+        }
+
+        /* TOP BAR */
+        .admin-topbar {
+            background: white;
+            padding: 20px 36px;
+            border-bottom: 1px solid #e8ddd4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-topbar h5 { font-size: 1.2rem; }
+        .admin-topbar p  { font-size: 0.9rem; }
+
+        /* CONTENT CARD — diperbesar */
+        .content-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        .content-card h6 { font-size: 1.15rem; }
+
+        /* DROPZONE UPLOAD */
+        .upload-dropzone {
+            border: 2px dashed #d8c9bb;
+            border-radius: 16px;
+            padding: 46px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            background: #fdfbf9;
+        }
+        .upload-dropzone:hover,
+        .upload-dropzone.dragover {
+            border-color: #5C4033;
+            background: #f5efe8;
+        }
+        .upload-dropzone i {
+            font-size: 2.6rem;
+            color: #c7b7a7;
+            margin-bottom: 12px;
+        }
+        .upload-dropzone p:first-of-type { font-size: 1rem; }
+        .upload-dropzone p:last-of-type { font-size: 0.88rem; }
+
+        .preview-thumb {
+            width: 84px; height: 84px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #e8ddd4;
+        }
+
+        .btn-upload-submit {
+            background-color: #5C4033;
+            color: white;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 12px 28px;
+            border-radius: 50px;
+        }
+        .btn-upload-submit:hover { background-color: #4a3228; color: white; }
+        .btn-upload-submit:disabled { background-color: #cbbfb3; }
+
+        /* GALERI MENU */
+        .menu-photo-card {
+            position: relative;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        .menu-photo-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .menu-photo-delete {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: rgba(33,21,11,0.65);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px; height: 36px;
+            font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .menu-photo-delete:hover { background: rgba(220,53,69,0.85); }
+
+        .empty-state {
+            text-align: center;
+            padding: 36px;
+            color: #a89180;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid p-0">
+    <div class="row g-0">
+
+        <!-- SIDEBAR -->
+        <div class="col-md-3 col-lg-2 admin-sidebar">
+            <div class="brand">
+                <a href="/" class="text-decoration-none d-flex align-items-center gap-2">
+                    <span class="brand-logo">☕</span>
+                    <span class="fw-bold brand-title">
+                        <span style="color:#dbccbe;">Coffee</span><span class="text-white">Hunter.</span>
+                    </span>
+                </a>
+                <p class="mb-0 mt-1 brand-sub">ADMIN PANEL</p>
+            </div>
+            <nav class="d-flex flex-column">
+                <a href="/admin" class="admin-nav-link">
+                    <i class="fa-solid fa-gauge"></i> Dashboard
+                </a>
+                <a href="/admin/cafe/tambah" class="admin-nav-link">
+                    <i class="fa-solid fa-plus"></i> Tambah Cafe
+                </a>
+                <a href="/admin/users" class="admin-nav-link">
+                    <i class="fa-solid fa-users"></i> Kelola User
+                </a>
+                <a href="/admin/profil" class="admin-nav-link">
+                    <i class="fa-solid fa-user-gear"></i> Pengaturan Profil
+                </a>
+                <a href="/" class="admin-nav-link mt-3" style="border-top: 1px solid #3a2518; padding-top: 16px;">
+                    <i class="fa-solid fa-arrow-left"></i> Kembali ke Situs
+                </a>
+            </nav>
+        </div>
+
+        <!-- MAIN -->
+        <div class="col-md-9 col-lg-10">
+
+            <div class="admin-topbar">
+                <div>
+                    <h5 class="fw-bold mb-0" style="color:#21150b;">Kelola Menu</h5>
+                    <p class="mb-0" style="color:#a89180;">{{ coffee.nama }} — {{ coffee.area }}</p>
+                </div>
+                <a href="/admin" class="btn btn-sm btn-outline-secondary rounded-pill">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Kembali ke Dashboard
+                </a>
+            </div>
+
+            <div class="p-4">
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} rounded-3">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- FORM UPLOAD -->
+                <div class="content-card mb-4">
+                    <h6 class="fw-bold mb-3" style="color:#21150b;">Upload Foto Menu</h6>
+
+                    <form id="uploadForm" method="POST"
+                          action="/admin/cafe/{{ coffee.id }}/menu/upload"
+                          enctype="multipart/form-data">
+
+                        <label for="fileInput" class="upload-dropzone d-block mb-3" id="dropzone">
+                            <i class="fa-solid fa-cloud-arrow-up d-block"></i>
+                            <p class="mb-1 fw-semibold" style="color:#5C4033;">Klik atau seret gambar ke sini</p>
+                            <p class="mb-0" style="color:#a89180;">
+                                Format JPG/PNG, maksimal 2MB per file. Bisa pilih lebih dari satu.
+                            </p>
+                        </label>
+                        <input type="file" id="fileInput" name="menu_photos"
+                               accept=".jpg,.jpeg,.png" multiple hidden>
+
+                        <div id="previewList" class="d-flex flex-wrap gap-2 mb-3"></div>
+
+                        <button type="submit" class="btn btn-upload-submit" id="submitBtn" disabled>
+                            <i class="fa-solid fa-upload me-1"></i> Upload Foto
+                        </button>
+                    </form>
+                </div>
+
+                <!-- GALERI FOTO MENU -->
+                <div class="content-card">
+                    <h6 class="fw-bold mb-3" style="color:#21150b;">Foto Menu Saat Ini ({{ menu_images|length }})</h6>
+
+                    {% if menu_images %}
+                    <div class="row g-3">
+                        {% for img in menu_images %}
+                        <div class="col-6 col-md-3">
+                            <div class="menu-photo-card">
+                                <img src="/static/images/menu/{{ img.filename }}" alt="Menu {{ coffee.nama }}">
+                                <form method="POST" action="/admin/menu/{{ img.id }}/hapus"
+                                      onsubmit="return confirm('Hapus foto ini?');">
+                                    <button type="submit" class="menu-photo-delete">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <div style="font-size:2.5rem; margin-bottom:10px;">📷</div>
+                        <p class="mb-0">Belum ada foto menu yang diupload.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const fileInput   = document.getElementById('fileInput');
+const dropzone    = document.getElementById('dropzone');
+const previewList = document.getElementById('previewList');
+const submitBtn   = document.getElementById('submitBtn');
+
+function renderPreview() {
+    previewList.innerHTML = '';
+    const files = fileInput.files;
+
+    if (files.length === 0) {
+        submitBtn.disabled = true;
+        return;
+    }
+    submitBtn.disabled = false;
+
+    Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'preview-thumb';
+            previewList.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+fileInput.addEventListener('change', renderPreview);
+
+// Drag & drop support
+['dragover', 'dragenter'].forEach(evt => {
+    dropzone.addEventListener(evt, e => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+    });
+});
+['dragleave', 'drop'].forEach(evt => {
+    dropzone.addEventListener(evt, e => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+    });
+});
+dropzone.addEventListener('drop', e => {
+    fileInput.files = e.dataTransfer.files;
+    renderPreview();
+});
+</script>
+<script>
+// Tampilkan hasil upload (jika ada) via alert
+const urlParams = new URLSearchParams(window.location.search);
+const berhasil = urlParams.get('berhasil');
+const gagal = urlParams.get('gagal');
+
+if (berhasil !== null) {
+    let pesan = `${berhasil} foto berhasil diupload.`;
+    if (parseInt(gagal) > 0) {
+        pesan += `\n${gagal} foto gagal (format harus JPG/PNG, maksimal 2MB).`;
+    }
+    alert(pesan);
+    window.history.replaceState({}, document.title, window.location.pathname);
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

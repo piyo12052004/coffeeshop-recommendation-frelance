@@ -1,0 +1,9 @@
+version python3 3.14 
+python3 -m venv venv
+source venv/bin/activate
+pip install --upgrade pip
+pip install Flask Flask-SQLAlchemy mysql-connector-python pandas numpy scikit-learn selenium webdriver-manager python-dotenv Authlib requests openpyxl
+pip install pymysql
+
+ssh
+instal docker 

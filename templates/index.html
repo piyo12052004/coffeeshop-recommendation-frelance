@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Shop Bekasi</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        html { font-size: 19px; } /* default browser = 16px, dinaikkan agar seluruh halaman lebih besar */
+
+        /* NAVBAR */
+        .navbar-brand { font-size: 1.9rem !important; }
+        .nav-link { font-size: 1.05rem !important; }
+
+        .cta-section { background: linear-gradient(135deg, #3a2010, #5C4033); border-radius: 20px; }
+        .fitur-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 28px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            transition: transform 0.2s;
+        }
+        .fitur-card:hover { transform: translateY(-5px); }
+        .fitur-icon {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: #f0e6da;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 18px auto;
+            font-size: 1.8rem;
+        }
+        .stat-item {
+            padding: 48px 20px;
+            text-align: center;
+            border-right: 1px solid #3a2518;
+        }
+        .stat-item:last-child { border-right: none; }
+        .stat-number {
+            font-size: 3.4rem;
+            font-weight: 800;
+            color: #dbccbe;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        .stat-label {
+            color: #a89180;
+            font-size: 1.05rem;
+        }
+
+        /* Button styles */
+        .btn-maps {
+            background-color: #c7b7a7;
+            color: #4e342e;
+            border: none;
+            font-weight: 600;
+            font-size: 0.98rem;
+            padding: 10px 16px;
+        }
+        .btn-maps:hover {
+            background-color: #b5a393;
+            color: #3a2010;
+        }
+        .btn-profile {
+            background-color: #5C4033;
+            color: white;
+            border: none;
+            font-weight: 600;
+            font-size: 0.98rem;
+            padding: 10px 16px;
+        }
+        .btn-profile:hover {
+            background-color: #4a3228;
+            color: white;
+        }
+        .btn-disabled-maps {
+            background-color: #d8d1cb;
+            color: #999;
+            border: none;
+            font-size: 0.98rem;
+            padding: 10px 16px;
+        }
+
+        /* COFFEE CARD CONTENT */
+        .coffee-title { font-size: 1.2rem; }
+        .coffee-image { height: 230px !important; }
+
+        /* SECTION HEADINGS */
+        #sectionTitle { font-size: 1.9rem; }
+
+        /* HERO */
+        .hero-eyebrow { font-size: 1.05rem !important; letter-spacing: 2px; }
+        .hero-title { font-size: 3.8rem !important; }
+        .hero-subtitle { font-size: 1.2rem !important; }
+        .search-box .form-control { font-size: 1.05rem !important; padding: 16px 20px !important; }
+        .search-box .btn { width: 56px !important; height: 56px !important; min-width: 56px !important; font-size: 1.1rem; }
+
+        /* FOOTER */
+        footer h5 { font-size: 1.6rem; }
+        footer p { font-size: 0.95rem !important; }
+    </style>
+</head>
+<body style="background-color:#f8f4f1;">
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg px-5" style="background-color:#21150b;">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold fs-3 d-flex align-items-center" href="/">
+            <span style="font-size:38px;">☕</span>
+            <span class="ms-1">
+                <span style="color:#dbccbe;">Coffee</span><span class="text-white">Hunter.</span>
+            </span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto gap-2">
+                <li class="nav-item">
+                    <a class="nav-link fw-bold" style="color:#dbccbe;" href="/">Beranda</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="/rekomendasi">Cari Rekomendasi</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="/daftar-coffeeshop">Daftar Coffee Shop</a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center gap-2">
+                {% if session.get('user_id') %}
+                    <span class="text-white me-1">Halo, {{ session.username }}</span>
+
+                    {% if is_admin %}
+                    <a href="/admin" class="btn btn-outline-light" title="Admin Panel">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </a>
+                    {% endif %}
+
+                    <a href="/my-bookmark" class="btn btn-outline-light">
+                        <i class="fa-solid fa-bookmark"></i>
+                    </a>
+                    <a href="/logout" class="btn fw-semibold"
+                        style="background-color:#dbccbe; color:#21150b; border:none;">
+                        <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                    </a>
+                {% else %}
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#modalLogin"
+                       class="btn btn-outline-light fw-semibold">Login</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#modalRegister"
+                       class="btn fw-semibold"
+                       style="background-color:#dbccbe; color:#21150b; border:none;">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ============================== -->
+<!-- MODAL LOGIN -->
+<!-- ============================== -->
+<div class="modal fade" id="modalLogin" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4 p-3">
+      <div class="modal-body">
+
+        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></button>
+
+        <div class="text-center mb-4">
+          <h2 class="fw-bold" style="color:#21150b;">Welcome!</h2>
+          <p style="color:#a89180;">Masuk ke akunmu</p>
+        </div>
+
+        {% if success %}
+        <div class="alert alert-success rounded-3" style="font-size:0.95rem;">{{ success }}</div>
+        {% endif %}
+        {% if login_error %}
+        <div class="alert alert-danger rounded-3" style="font-size:0.95rem;">{{ login_error }}</div>
+        {% endif %}
+
+        <a href="/login/google"
+           class="btn w-100 mb-3 fw-semibold d-flex align-items-center justify-content-center gap-2"
+           style="border:1.5px solid #ddd; background:white; color:#333; border-radius:10px; padding:12px; font-size:1rem;">
+            <img src="https://www.google.com/favicon.ico" width="20" height="20">
+            Masuk dengan Google
+        </a>
+
+        <div class="d-flex align-items-center mb-3">
+          <hr class="flex-grow-1">
+          <span class="mx-2" style="color:#a89180; font-size:0.9rem;">atau</span>
+          <hr class="flex-grow-1">
+        </div>
+
+        <form method="POST" action="/login">
+
+          <div class="mb-3">
+            <label class="fw-semibold" style="color:#5C4033;">Email atau Username</label>
+            <input type="text" name="identifier" class="form-control rounded-3"
+                   placeholder="Masukkan email atau username" required style="font-size:1rem; padding:10px 14px;">
+          </div>
+
+          <div class="mb-3">
+            <label class="fw-semibold" style="color:#5C4033;">Password</label>
+            <div class="position-relative">
+              <input type="password" name="password" id="loginPassword"
+                     class="form-control rounded-3" required style="font-size:1rem; padding:10px 14px;">
+              <i class="fa-regular fa-eye position-absolute"
+                 id="toggleLoginPassword"
+                 style="right:14px; top:50%; transform:translateY(-50%); cursor:pointer; color:#a89180;"></i>
+            </div>
+          </div>
+
+          <button class="btn fw-bold w-100 rounded-3"
+                  style="background-color:#21150b; color:#ffffff; padding:12px; font-size:1.05rem;">
+              Login
+          </button>
+
+        </form>
+
+        <p class="text-center mt-3" style="color:#7a6757;">
+          Belum punya akun?
+          <a href="#" data-bs-toggle="modal" data-bs-target="#modalRegister" data-bs-dismiss="modal"
+             style="color:#5C4033; font-weight:600;">Register</a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== -->
+<!-- MODAL REGISTER -->
+<!-- ============================== -->
+<div class="modal fade" id="modalRegister" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4 p-3">
+      <div class="modal-body">
+
+        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></button>
+
+        <div class="text-center mb-4">
+          <h2 class="fw-bold" style="color:#21150b;">Buat Akun Baru</h2>
+          <p style="color:#a89180;">Daftar untuk mulai menjelajahi coffeeshop favoritmu</p>
+        </div>
+
+        {% if reg_error %}
+        <div class="alert alert-danger rounded-3" style="font-size:0.95rem;">{{ reg_error }}</div>
+        {% endif %}
+
+        <a href="/login/google"
+           class="btn w-100 mb-3 fw-semibold d-flex align-items-center justify-content-center gap-2"
+           style="border:1.5px solid #ddd; background:white; color:#333; border-radius:10px; padding:12px; font-size:1rem;">
+            <img src="https://www.google.com/favicon.ico" width="20" height="20">
+            Daftar dengan Google
+        </a>
+
+        <div class="d-flex align-items-center mb-3">
+          <hr class="flex-grow-1">
+          <span class="mx-2" style="color:#a89180; font-size:0.9rem;">atau daftar manual</span>
+          <hr class="flex-grow-1">
+        </div>
+
+        <form method="POST" action="/register" id="registerForm">
+
+          <div class="mb-3">
+            <label class="fw-semibold" style="color:#5C4033;">Username</label>
+            <input type="text" name="username" class="form-control rounded-3" required minlength="3" maxlength="50" style="font-size:1rem; padding:10px 14px;">
+          </div>
+
+          <div class="mb-3">
+            <label class="fw-semibold" style="color:#5C4033;">Email</label>
+            <input type="email" name="email" class="form-control rounded-3" required style="font-size:1rem; padding:10px 14px;">
+          </div>
+
+          <div class="mb-3">
+            <label class="fw-semibold" style="color:#5C4033;">Password</label>
+            <div class="position-relative">
+              <input type="password" name="password" id="registerPassword"
+                     class="form-control rounded-3" required minlength="8"
+                     oninput="checkPasswordStrength()" style="font-size:1rem; padding:10px 14px;">
+              <i class="fa-regular fa-eye position-absolute"
+                 id="toggleRegisterPassword"
+                 style="right:14px; top:50%; transform:translateY(-50%); cursor:pointer; color:#a89180;"></i>
+            </div>
+
+            <!-- CHECKLIST VALIDASI -->
+            <ul class="list-unstyled mt-2 mb-0" style="font-size:0.88rem;">
+                <li id="check-length"><i class="fa-regular fa-circle"></i> Minimal 8 karakter</li>
+                <li id="check-upper"><i class="fa-regular fa-circle"></i> Mengandung huruf besar (A-Z)</li>
+                <li id="check-lower"><i class="fa-regular fa-circle"></i> Mengandung huruf kecil (a-z)</li>
+                <li id="check-number"><i class="fa-regular fa-circle"></i> Mengandung angka (0-9)</li>
+                <li id="check-symbol"><i class="fa-regular fa-circle"></i> Mengandung simbol (!@#$%...)</li>
+            </ul>
+          </div>
+
+          <button class="btn fw-bold w-100 rounded-3"
+                  style="background-color:#21150b; color:#ffffff; padding:12px; font-size:1.05rem;">
+              Register
+          </button>
+
+        </form>
+
+        <p class="text-center mt-3" style="color:#7a6757;">
+          Sudah punya akun?
+          <a href="#" data-bs-toggle="modal" data-bs-target="#modalLogin" data-bs-dismiss="modal"
+             style="color:#5C4033; font-weight:600;">Login</a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section style="
+    background-image: url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    min-height: 640px;
+    display: flex;
+    align-items: center;">
+    <div style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(33,21,11,0.72);"></div>
+    <div class="container text-center" style="position:relative; z-index:2;">
+        <p class="mb-2 hero-eyebrow" style="color:#dbccbe; text-transform:uppercase;">
+            Selamat Datang di CoffeeHunter.
+        </p>
+        <h1 class="fw-bold text-white mb-3 hero-title" style="text-shadow:0 2px 10px rgba(0,0,0,0.5); line-height:1.2;">
+            Temukan Coffee Shop<br>Terbaik di Bekasi
+        </h1>
+        <p class="mb-5 hero-subtitle" style="color:#dbccbe;">
+            Cari tempat nongkrong, WFC, healing, dan ngopi favoritmu
+        </p>
+        <div class="search-box d-flex justify-content-center">
+            <div class="d-flex align-items-center"
+            style="background:white; border-radius:50px; overflow:hidden; box-shadow:0 4px 25px rgba(0,0,0,0.3); width:60%;">
+                <input type="text" id="searchInput"
+                    class="form-control border-0 py-3 ps-4"
+                    placeholder="Cari coffee shop, area, atau fasilitas..."
+                    style="background:white; outline:none; box-shadow:none; color:#5C4033;">
+                <button class="btn m-1 d-flex align-items-center justify-content-center"
+                style="background:#5C4033; color:white; border-radius:50px; border:none;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- STATISTIK -->
+<div style="background-color:#21150b; padding:0;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 stat-item">
+                <div class="stat-number">100+</div>
+                <div class="stat-label">☕ Coffee Shop Terdaftar</div>
+            </div>
+            <div class="col-md-4 stat-item">
+                <div class="stat-number">4</div>
+                <div class="stat-label">📍 Area di Bekasi</div>
+            </div>
+            <div class="col-md-4 stat-item">
+                <div class="stat-number">4.5+</div>
+                <div class="stat-label">⭐ Rata-rata Rating</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- DATA SEMUA COFFEESHOP (hidden) -->
+<div id="allCoffeeData" style="display:none;">
+    {% for coffee in all_coffeeshops %}
+    <div class="all-coffee-item"
+        data-nama="{{ coffee.nama }}"
+        data-area="{{ coffee.area }}"
+        data-rating="{{ coffee.rating }}"
+        data-harga="{{ coffee.kisaran_harga }}"
+        data-fasilitas="{{ coffee.fasilitas }}"
+        data-maps="{{ coffee.maps_link }}"
+        data-id="{{ coffee.id }}"
+        data-image="{{ coffee.image_url if coffee.image_url else 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085' }}"
+        data-bookmarked="{{ 'true' if coffee.id in bookmarked_ids else 'false' }}">
+    </div>
+    {% endfor %}
+</div>
+
+
+<!-- LIST COFFEESHOP -->
+<div style="background-color:#f8f4f1; padding:70px 0;">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold mb-1" style="color:#5C4033;" id="sectionTitle">Coffee Shop Terpopuler</h2>
+            </div>
+            <a href="/daftar-coffeeshop" class="btn rounded-pill fw-semibold"
+            style="background:#f0e6da; color:#5C4033; border:none; font-size:1rem; padding:10px 20px;">
+                Lihat Semua <i class="fa-solid fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row" id="coffeeContainer">
+            {% for coffee in coffeeshops %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4 coffee-item">
+                <div class="card coffee-card border-0 shadow-sm h-100"
+                style="background-color:#ffffff; border-radius:20px; overflow:hidden;">
+                    <div style="position:relative;">
+                        <img src="{{ coffee.image_url if coffee.image_url else 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085' }}"
+                        class="card-img-top coffee-image" alt="{{ coffee.nama }}"
+                        style="object-fit:cover;"
+                        onerror="this.src='https://images.unsplash.com/photo-1495474472287-4d71bcdd2085'">
+                        <span class="badge position-absolute"
+                        style="top:12px; left:12px; background:rgba(33,21,11,0.75);
+                        color:#dbccbe; font-size:0.85rem; padding:6px 12px; border-radius:20px;">
+                            📍 {{ coffee.area }}
+                        </span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5 class="coffee-title fw-bold mb-0" style="color:#21150b;">{{ coffee.nama }}</h5>
+                            {% if coffee.id in bookmarked_ids %}
+                            <i data-id="{{ coffee.id }}" onclick="toggleBookmark(this)"
+                                class="fa-solid fa-bookmark text-danger fs-4"
+                                style="cursor:pointer;"></i>
+                            {% else %}
+                            <i data-id="{{ coffee.id }}" onclick="toggleBookmark(this)"
+                                class="fa-regular fa-bookmark fs-4"
+                                style="cursor:pointer; color:#8a7768;"></i>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
+                            <span class="fw-bold text-warning" style="font-size:1.05rem;">⭐ {{ coffee.rating }}</span>
+                            <span class="badge rounded-pill"
+                            style="background:#f0e6da; color:#5C4033; font-size:0.85rem; font-weight:600; padding:7px 14px;">
+                                {{ coffee.kisaran_harga }}
+                            </span>
+                        </div>
+                        <div class="d-flex flex-wrap gap-1 mb-3">
+                            {% for f in coffee.fasilitas.split(',') %}
+                            <span class="badge rounded-pill"
+                            style="background:#e8ddd4; color:#4e342e; font-size:0.8rem; font-weight:500; padding:6px 12px;">{{ f.strip() }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <!-- BUTTON: Maps & Lihat Profil -->
+                        <div class="mt-auto d-flex gap-2">
+                            {% if coffee.maps_link and coffee.maps_link != "Tidak tersedia" %}
+                            <a href="{{ coffee.maps_link }}" target="_blank"
+                                class="btn btn-maps w-50 rounded-pill fw-bold">
+                                <i class="fa-solid fa-location-dot me-1"></i> Lihat Maps
+                            </a>
+                            {% else %}
+                            <button class="btn btn-disabled-maps w-50 rounded-pill" disabled>
+                                <i class="fa-solid fa-location-dot me-1"></i> Maps
+                            </button>
+                            {% endif %}
+
+                            <a href="/coffee/{{ coffee.id }}"
+                                class="btn btn-profile w-50 rounded-pill">
+                                <i class="fa-solid fa-store me-1"></i> Lihat Profil
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- FITUR UNGGULAN -->
+<div style="background-color:#fff; padding:80px 0;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold" style="color:#5C4033; font-size:2.2rem;">Kenapa CoffeeHunter?</h2>
+            <p style="color:#a89180; font-size:1.05rem;">Semua yang kamu butuhkan untuk menemukan kopi terbaik</p>
+        </div>
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <div class="fitur-card" style="height:100%;">
+                    <div class="fitur-icon">
+                        <i class="fa-solid fa-location-dot" style="color:#5C4033;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2" style="color:#5C4033; font-size:1.15rem;">Cari Berdasarkan Area</h5>
+                    <p style="color:#a89180; font-size:1rem; margin:0;">
+                        Filter coffee shop berdasarkan area yang ada di Kota Bekasi.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="fitur-card" style="height:100%;">
+                    <div class="fitur-icon">
+                        <i class="fa-solid fa-sliders" style="color:#5C4033;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2" style="color:#5C4033; font-size:1.15rem;">Filter Fasilitas & Harga</h5>
+                    <p style="color:#a89180; font-size:1rem; margin:0;">
+                        Cari yang ada outdoor, indoor/AC, mushola, parking, atau live music sesuai kebutuhanmu.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="fitur-card" style="height:100%;">
+                    <div class="fitur-icon">
+                        <i class="fa-solid fa-wand-magic-sparkles" style="color:#5C4033;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2" style="color:#5C4033; font-size:1.15rem;">Sistem Rekomendasi Pintar</h5>
+                    <p style="color:#a89180; font-size:1rem; margin:0;">
+                        Masukkan preferensimu dan sistem kami akan merekomendasikan coffee shop yang paling cocok.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div style="background-color:#f8f4f1; padding:70px 0;">
+    <div class="container">
+        <div class="cta-section p-5 text-center text-white">
+            <p style="color:#dbccbe; font-size:0.95rem; letter-spacing:2px; text-transform:uppercase; margin-bottom:10px;">
+                Fitur Rekomendasi
+            </p>
+            <h3 class="fw-bold mb-3" style="font-size:1.9rem;">Bingung Mau Ngopi di Mana?</h3>
+            <p class="mb-4" style="color:#dbccbe; font-size:1.1rem; max-width:560px; margin:0 auto 24px auto;">
+                Masukkan preferensimu dan sistem kami akan memberikan rekomendasi coffee shop paling cocok buat kamu.
+            </p>
+            <a href="/rekomendasi" class="btn fw-bold px-5 py-2 rounded-pill"
+            style="background-color:#dbccbe; color:#21150b; font-size:1.1rem;">
+                <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Coba Sekarang
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<!-- FOOTER -->
+<footer style="background-color:#21150b; padding:36px 0;">
+    <div class="container text-center">
+        <h5 class="fw-bold mb-1">
+            <span style="color:#dbccbe;">Coffee</span><span class="text-white">Hunter.</span>
+        </h5>
+        <p style="color:#a89180; margin-bottom:14px;">
+            Temukan Coffee Shop Sesuai Seleramu
+        </p>
+        <hr style="border-color:#3a2518; width:60%; margin:auto;">
+        <p class="mt-3 mb-0" style="color:#a89180; font-size:0.85rem;">
+            © 2026 CoffeeHunter.
+        </p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('login_error')) {
+        new bootstrap.Modal(document.getElementById('modalLogin')).show();
+    }
+    if (urlParams.get('reg_error')) {
+        new bootstrap.Modal(document.getElementById('modalRegister')).show();
+    }
+    if (urlParams.get('success')) {
+        new bootstrap.Modal(document.getElementById('modalLogin')).show();
+    }
+});
+
+const searchInput = document.getElementById("searchInput");
+const coffeeContainer = document.getElementById("coffeeContainer");
+const sectionTitle = document.getElementById("sectionTitle");
+const allData = document.querySelectorAll(".all-coffee-item");
+const defaultHTML = coffeeContainer.innerHTML;
+
+searchInput.addEventListener("input", function () {
+    const keyword = this.value.toLowerCase().trim();
+
+    if (keyword === "") {
+        coffeeContainer.innerHTML = defaultHTML;
+        sectionTitle.innerText = "Coffee Shop Terpopuler";
+        return;
+    }
+
+    sectionTitle.innerText = `Hasil pencarian: "${this.value}"`;
+
+    const filtered = Array.from(allData).filter(item => {
+        return (
+            item.dataset.nama.toLowerCase().includes(keyword) ||
+            item.dataset.area.toLowerCase().includes(keyword) ||
+            item.dataset.fasilitas.toLowerCase().includes(keyword)
+        );
+    });
+
+    if (filtered.length === 0) {
+        coffeeContainer.innerHTML = `
+            <div class="col-12 text-center py-5">
+                <p style="color:#a89180; font-size:1.2rem;">
+                    ☕ Coffee shop "<b>${this.value}</b>" tidak ditemukan.
+                </p>
+            </div>`;
+        return;
+    }
+
+    coffeeContainer.innerHTML = filtered.map(item => {
+        const isBookmarked = item.dataset.bookmarked === "true";
+
+        const mapsBtn = item.dataset.maps && item.dataset.maps !== "Tidak tersedia"
+            ? `<a href="${item.dataset.maps}" target="_blank" class="btn btn-maps w-50 rounded-pill">
+                <i class="fa-solid fa-location-dot me-1"></i> Lihat Maps
+               </a>`
+            : `<button class="btn btn-disabled-maps w-50 rounded-pill" disabled>
+                <i class="fa-solid fa-location-dot me-1"></i> Maps
+               </button>`;
+
+        const profileBtn = `<a href="/coffee/${item.dataset.id}" class="btn btn-profile w-50 rounded-pill">
+            <i class="fa-solid fa-store me-1"></i> Lihat Profil
+        </a>`;
+
+        return `
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="card border-0 shadow-sm h-100" style="background-color:#ffffff; border-radius:20px; overflow:hidden;">
+                <div style="position:relative;">
+                    <img src="${item.dataset.image}"
+                    class="card-img-top coffee-image" alt="${item.dataset.nama}" style="object-fit:cover;"
+                    onerror="this.src='https://images.unsplash.com/photo-1495474472287-4d71bcdd2085'">
+                    <span class="badge position-absolute"
+                    style="top:12px; left:12px; background:rgba(33,21,11,0.75); color:#dbccbe; font-size:0.85rem; padding:6px 12px; border-radius:20px;">
+                        📍 ${item.dataset.area}
+                    </span>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="coffee-title fw-bold mb-0" style="color:#21150b;">${item.dataset.nama}</h5>
+                        <i data-id="${item.dataset.id}" onclick="toggleBookmark(this)"
+                        class="fa-${isBookmarked ? 'solid text-danger' : 'regular'} fa-bookmark fs-4"
+                        style="cursor:pointer; ${isBookmarked ? '' : 'color:#8a7768;'}"></i>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
+                        <span class="fw-bold text-warning" style="font-size:1.05rem;">⭐ ${item.dataset.rating}</span>
+                        <span class="badge rounded-pill" style="background:#f0e6da; color:#5C4033; font-size:0.85rem; font-weight:600; padding:7px 14px;">
+                            ${item.dataset.harga}
+                        </span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-1 mb-3">
+                        ${item.dataset.fasilitas.split(',').map(f => `<span class="badge rounded-pill" style="background:#e8ddd4; color:#4e342e; font-size:0.8rem; font-weight:500; padding:6px 12px;">${f.trim()}</span>`).join('')}
+                    </div>
+                    <div class="mt-auto d-flex gap-2">${mapsBtn}${profileBtn}</div>
+                </div>
+            </div>
+        </div>`;
+    }).join("");
+});
+
+function toggleBookmark(el) {
+    const coffeeId = el.dataset.id;
+
+    fetch(`/bookmark/ajax/${coffeeId}`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.status === 401) {
+            new bootstrap.Modal(document.getElementById('modalLogin')).show();
+            return null;
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data) return;
+        if (data.status === 'added') {
+            el.classList.remove('fa-regular');
+            el.classList.add('fa-solid', 'text-danger');
+            el.style.color = '';
+        } else if (data.status === 'removed') {
+            el.classList.remove('fa-solid', 'text-danger');
+            el.classList.add('fa-regular');
+            el.style.color = '#8a7768';
+        }
+    })
+    .catch(error => {
+        console.error('Bookmark Error:', error);
+    });
+}
+</script>
+
+<!-- ============================== -->
+<!-- SCRIPT TOGGLE PASSWORD & VALIDASI PASSWORD -->
+<!-- ============================== -->
+<script>
+function setupPasswordToggle(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    if (!input || !icon) return;
+
+    icon.addEventListener('click', function () {
+        const isPassword = input.getAttribute('type') === 'password';
+        input.setAttribute('type', isPassword ? 'text' : 'password');
+        icon.classList.toggle('fa-eye');
+        icon.classList.toggle('fa-eye-slash');
+    });
+}
+
+setupPasswordToggle('loginPassword', 'toggleLoginPassword');
+setupPasswordToggle('registerPassword', 'toggleRegisterPassword');
+
+const registerPasswordInput = document.getElementById('registerPassword');
+const registerForm = document.getElementById('registerForm');
+
+function checkPasswordStrength() {
+    const password = registerPasswordInput.value;
+
+    const rules = {
+        'check-length': password.length >= 8,
+        'check-upper': /[A-Z]/.test(password),
+        'check-lower': /[a-z]/.test(password),
+        'check-number': /[0-9]/.test(password),
+        'check-symbol': /[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\/~`;]/.test(password)
+    };
+
+    for (const id in rules) {
+        const li   = document.getElementById(id);
+        const icon = li.querySelector('i');
+        if (rules[id]) {
+            icon.classList.remove('fa-circle');
+            icon.classList.add('fa-circle-check');
+            li.style.color = '#2e7d32';
+        } else {
+            icon.classList.remove('fa-circle-check');
+            icon.classList.add('fa-circle');
+            li.style.color = '#7a6757';
+        }
+    }
+
+    return Object.values(rules).every(Boolean);
+}
+
+if (registerForm) {
+    registerForm.addEventListener('submit', function (e) {
+        const isStrong = checkPasswordStrength();
+        if (!isStrong) {
+            e.preventDefault();
+            alert('Password belum memenuhi syarat keamanan. Cek checklist di bawah kolom password.');
+        }
+    });
+}
+</script>
+</body>
+</html>

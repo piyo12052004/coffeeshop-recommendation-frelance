@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelola User — CoffeeHunter Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+    html { font-size: 24px; }
+
+    body { background-color: #f8f4f1; }
+
+    .admin-sidebar {
+        background-color: #21150b;
+        min-height: 100vh;
+        padding: 24px 0;
+        position: sticky;
+        top: 0;
+    }
+    .admin-sidebar .brand {
+        padding: 0 24px 28px 24px;
+        border-bottom: 1px solid #3a2518;
+        margin-bottom: 20px;
+    }
+    .brand-logo { font-size: 2rem; }   
+    .brand-title { font-size: 1.35rem; } 
+    .brand-sub {
+        color: #ad957f;
+        font-size: 1rem;
+        letter-spacing: 1px;
+    }
+    .admin-nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 24px;
+        color: #a89180;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-left: 3px solid transparent;
+        transition: background 0.15s;
+    }
+    .admin-nav-link:hover {
+        background: rgba(255,255,255,0.04);
+        color: #dbccbe;
+    }
+    .admin-nav-link.active {
+        background: rgba(219,204,190,0.08);
+        color: #dbccbe;
+        border-left-color: #dbccbe;
+    }
+    .admin-nav-link i {
+        width: 22px;
+        text-align: center;
+        flex-shrink: 0;
+        margin-right: 12px;
+    }
+
+    /* TOP BAR */
+    .admin-topbar {
+        background: white;
+        padding: 20px 36px;
+        border-bottom: 1px solid #e8ddd4;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .admin-topbar h5 { font-size: 1.2rem; }
+    .admin-topbar p  { font-size: 0.9rem; }
+
+    /* CONTENT CARD (diperbesar) */
+    .content-card {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+    .content-card h6 {
+        font-size: 1.15rem;
+    }
+
+    /* TABLE */
+    .table-admin thead th {
+        color: #a89180;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+        border-bottom: 2px solid #f0e6da;
+        padding: 12px 14px;
+    }
+    .table-admin tbody td {
+        padding: 14px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f5f0ea;
+        font-size: 0.95rem;
+    }
+    .table-admin tbody tr:hover { background: #faf6f2; }
+
+    .avatar {
+        width: 46px; height: 46px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #e8ddd4;
+    }
+    .avatar-placeholder {
+        width: 46px; height: 46px;
+        border-radius: 50%;
+        background: #f0e6da;
+        display: inline-flex; align-items: center; justify-content: center;
+        color: #5C4033; font-size: 1rem; font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .badge-admin  { background: #fdf3e7; color: #a0522d; font-size: 0.8rem; font-weight: 700; padding: 4px 11px; border-radius: 12px; }
+    .badge-user   { background: #f0e6da; color: #7a6757; font-size: 0.8rem; font-weight: 600; padding: 4px 11px; border-radius: 12px; }
+    .badge-google { background: #e8f4fd; color: #1a73e8; font-size: 0.78rem; font-weight: 600; padding: 3px 10px; border-radius: 10px; }
+
+    .btn-toggle {
+        font-size: 0.85rem; padding: 6px 13px; border-radius: 50px;
+        border: 1px solid #e8ddd4;
+        background: #fff; color: #5C4033;
+        font-weight: 600; transition: background 0.15s;
+        cursor: pointer;
+    }
+    .btn-toggle:hover { background: #f0e6da; }
+    .btn-toggle.is-admin { border-color: #c0855a; background: #fdf3e7; color: #a0522d; }
+    .btn-toggle.is-admin:hover { background: #f5dfc0; }
+
+    .btn-hapus {
+        font-size: 0.85rem; padding: 6px 12px; border-radius: 50px;
+        border: 1px solid #f5c6cb;
+        background: #fff8f8; color: #c62828;
+        font-weight: 600; transition: background 0.15s;
+        cursor: pointer;
+    }
+    .btn-hapus:hover { background: #fdecea; }
+
+    .stat-chip {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: #f0e6da; color: #5C4033;
+        border-radius: 50px; padding: 6px 14px;
+        font-size: 0.9rem; font-weight: 600;
+    }
+    .stat-chip.admin { background: #fdf3e7; color: #a0522d; }
+
+    /* SEARCH INPUT */
+    .search-input-user {
+        padding-left: 42px;
+        font-size: 1rem;
+        width: 280px;
+        border-color: #e8ddd4;
+        height: 42px;
+    }
+    .search-icon-user {
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a89180;
+        font-size: 1rem;
+    }
+
+    .modal-content  { border-radius: 16px; border: none; }
+    .modal-header   { background: #f8f4f1; border-bottom: 1px solid #e8ddd4; border-radius: 16px 16px 0 0; }
+    .modal-title    { font-size: 1.05rem; font-weight: 700; color: #21150b; }
+    .btn-confirm-hapus {
+        background: #c62828; color: #fff; border: none;
+        border-radius: 50px; font-size: 0.92rem; font-weight: 600; padding: 8px 18px;
+    }
+    .btn-confirm-hapus:hover { background: #b71c1c; color: #fff; }
+    .btn-batal {
+        background: #f0e6da; color: #5C4033; border: none;
+        border-radius: 50px; font-size: 0.92rem; font-weight: 600; padding: 8px 16px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container-fluid p-0">
+    <div class="row g-0">
+
+        <!-- ══════════ SIDEBAR ══════════ -->
+        <div class="col-md-3 col-lg-2 admin-sidebar">
+            <div class="brand">
+                <a href="/" class="text-decoration-none d-flex align-items-center gap-2">
+                    <span class="brand-logo">☕</span>
+                    <span class="fw-bold brand-title">
+                        <span style="color:#dbccbe;">Coffee</span><span class="text-white">Hunter.</span>
+                    </span>
+                </a>
+                <p class="mb-0 mt-1 brand-sub">ADMIN PANEL</p>
+            </div>
+            <nav class="d-flex flex-column">
+                <a href="/admin" class="admin-nav-link">
+                    <i class="fa-solid fa-gauge"></i> Dashboard
+                </a>
+                <a href="/admin/cafe/tambah" class="admin-nav-link">
+                    <i class="fa-solid fa-plus"></i> Tambah Cafe
+                </a>
+                <a href="/admin/users" class="admin-nav-link active">
+                    <i class="fa-solid fa-users"></i> Kelola User
+                </a>
+                <a href="/admin/profil" class="admin-nav-link">
+                    <i class="fa-solid fa-user-gear"></i> Pengaturan Profil
+                </a>
+                <a href="/" class="admin-nav-link mt-3" style="border-top: 1px solid #3a2518; padding-top: 16px;">
+                    <i class="fa-solid fa-arrow-left"></i> Kembali ke Situs
+                </a>
+            </nav>
+        </div>
+
+        <!-- ══════════ MAIN ══════════ -->
+        <div class="col-md-9 col-lg-10">
+
+            <!-- Top bar -->
+            <div class="admin-topbar">
+                <div>
+                    <h5 class="fw-bold mb-0" style="color:#21150b;">Kelola User</h5>
+                    <p class="mb-0" style="color:#a89180;">Manajemen akun pengguna terdaftar di CoffeeHunter</p>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="stat-chip"><i class="fa-solid fa-user"></i> {{ users|length }} user</span>
+                    <span class="stat-chip admin"><i class="fa-solid fa-shield"></i> {{ users|selectattr('is_admin')|list|length }} admin</span>
+                    <a href="/logout" class="btn btn-sm btn-outline-secondary rounded-pill ms-1">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="p-4">
+
+                <!-- Alert error -->
+                {% if request.args.get('error') %}
+                <div class="alert d-flex align-items-center gap-2 mb-3"
+                     style="background:#fff8e1; border:none; border-radius:10px; color:#795548; font-size:0.92rem;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    {{ request.args.get('error')|replace('+', ' ') }}
+                </div>
+                {% endif %}
+
+                <div class="content-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h6 class="fw-bold mb-0" style="color:#21150b;">Daftar Pengguna</h6>
+                        <div class="position-relative">
+                            <i class="fa-solid fa-magnifying-glass position-absolute search-icon-user"></i>
+                            <input type="text" id="searchInput"
+                                   class="form-control rounded-pill search-input-user"
+                                   placeholder="Cari nama / email…">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-admin mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Login Via</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody">
+                                {% if users %}
+                                    {% for user in users %}
+                                    <tr class="user-row"
+                                        data-nama="{{ user.username|lower }}"
+                                        data-email="{{ user.email|lower }}">
+                                        <td style="color:#a89180; font-size:0.85rem; width:36px;">{{ loop.index }}</td>
+
+                                        <!-- Avatar + Nama -->
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                {% if user.profile_picture %}
+                                                    <img src="{{ user.profile_picture }}" class="avatar" alt="{{ user.username }}">
+                                                {% else %}
+                                                    <div class="avatar-placeholder">{{ user.username[0] }}</div>
+                                                {% endif %}
+                                                <span class="fw-semibold" style="color:#21150b;">
+                                                    {{ user.username }}
+                                                    {% if user.id == current_user_id %}
+                                                    <span style="font-size:0.78rem; color:#a89180; font-weight:400;">(kamu)</span>
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td style="color:#7a6757;">{{ user.email }}</td>
+
+                                        <!-- Login via — cek password None berarti login Google -->
+                                        <td>
+                                            {% if user.password is none %}
+                                            <span class="badge-google"><i class="fa-brands fa-google me-1"></i>Google</span>
+                                            {% else %}
+                                            <span style="font-size:0.85rem; color:#a89180;">Email</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <!-- Status -->
+                                        <td>
+                                            {% if user.is_admin %}
+                                            <span class="badge-admin"><i class="fa-solid fa-shield me-1"></i>Admin</span>
+                                            {% else %}
+                                            <span class="badge-user">User</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <!-- Aksi -->
+                                        <td class="text-end">
+                                            {% if user.id != current_user_id %}
+                                                <!-- Toggle Admin -->
+                                                <form method="POST"
+                                                      action="/admin/users/{{ user.id }}/toggle-admin"
+                                                      class="d-inline me-1">
+                                                    <button type="submit"
+                                                            class="btn-toggle {% if user.is_admin %}is-admin{% endif %}"
+                                                            title="{{ 'Cabut admin' if user.is_admin else 'Jadikan admin' }}">
+                                                        <i class="fa-solid fa-shield me-1"></i>
+                                                        {{ 'Cabut Admin' if user.is_admin else 'Jadikan Admin' }}
+                                                    </button>
+                                                </form>
+                                                <!-- Hapus -->
+                                                <button type="button"
+                                                        class="btn-hapus"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalHapus"
+                                                        data-userid="{{ user.id }}"
+                                                        data-username="{{ user.username }}">
+                                                    <i class="fa-solid fa-trash me-1"></i> Hapus
+                                                </button>
+                                            {% else %}
+                                            <span style="font-size:0.85rem; color:#cbbfb3;">— akun aktif</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4" style="color:#a89180;">Belum ada pengguna terdaftar.</td>
+                                </tr>
+                                {% endif %}
+                                <tr id="noResultRow" style="display:none;">
+                                    <td colspan="6" class="text-center py-4" style="color:#a89180;">☕ Tidak ditemukan.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div><!-- /p-4 -->
+        </div><!-- /col main -->
+    </div>
+</div>
+
+
+<!-- ══════════ MODAL KONFIRMASI HAPUS ══════════ -->
+<div class="modal fade" id="modalHapus" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa-solid fa-triangle-exclamation me-1" style="color:#c62828;"></i> Hapus User
+                </h5>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="font-size:0.92rem; color:#444; padding:1.2rem 1.3rem;">
+                Yakin hapus akun <strong id="hapusNama"></strong>?
+                <br><span style="font-size:0.85rem; color:#a89180;">Semua bookmark user ini juga akan dihapus.</span>
+            </div>
+            <div class="modal-footer" style="border-top:1px solid #e8ddd4; gap:8px;">
+                <button type="button" class="btn-batal" data-bs-dismiss="modal">Batal</button>
+                <form id="formHapus" method="POST" action="">
+                    <button type="submit" class="btn-confirm-hapus">
+                        <i class="fa-solid fa-trash me-1"></i> Hapus
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Isi modal hapus
+    document.getElementById('modalHapus').addEventListener('show.bs.modal', function (e) {
+        const btn = e.relatedTarget;
+        document.getElementById('hapusNama').textContent = btn.dataset.username;
+        document.getElementById('formHapus').action = `/admin/users/${btn.dataset.userid}/hapus`;
+    });
+
+    // Live search
+    document.getElementById('searchInput').addEventListener('input', function () {
+        const q = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.user-row');
+        let visible = 0;
+        rows.forEach(row => {
+            const match = row.dataset.nama.includes(q) || row.dataset.email.includes(q);
+            row.style.display = match ? '' : 'none';
+            if (match) visible++;
+        });
+        document.getElementById('noResultRow').style.display = visible === 0 ? '' : 'none';
+    });
+</script>
+</body>
+</html>

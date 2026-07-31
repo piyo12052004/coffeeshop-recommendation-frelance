@@ -1,0 +1,96 @@
+body{
+    background: #f4f4f4;
+}
+
+/* HERO */
+.hero{
+    background:
+    linear-gradient(
+    rgba(0, 0, 0, 0.5),
+    rgba(0,0,0,.5)
+    ),
+    url('https://images.unsplash.com/photo-1445116572660-236099ec97a0');
+
+    background-size: cover;
+    background-position: center;
+
+    padding: 120px 20px;
+}
+
+.hero h1{
+    font-size: 52px;
+}
+
+.search-box{
+    max-width: 600px;
+    margin: auto;
+}
+
+.search-box input{
+    border-radius: 40px;
+    height: 55px;
+    font-size: 18px;
+    padding-left: 25px;
+}
+
+/* CARD COFFEESHOP */
+
+.coffee-card{
+    border: none;
+    border-radius: 18px;
+    overflow: hidden;
+    transition: 0.3s;
+    background: white;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    height: 100%;
+}
+
+.coffee-card:hover{
+    transform: translateY(-8px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.coffee-card img{
+    height: 200px;
+    object-fit: cover;
+}
+
+.coffee-card .card-body{
+    padding: 18px;
+}
+
+.coffee-title{
+    font-size: 20px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 8px;
+}
+
+.coffee-address{
+    color: #777;
+    font-size: 14px;
+    min-height: 45px;
+}
+
+.badge-area{
+    background: #ffe9e9;
+    color: #d63384;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.rating-box{
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffb400;
+}
+
+.btn-location{
+    border-radius: 30px;
+    border: 1px solid #ffc3a0;
+}
+
+.btn-bookmark{
+    border-radius: 30px;
+}
