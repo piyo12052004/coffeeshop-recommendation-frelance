@@ -1,9 +1,152 @@
-version python3 3.14 
-python3 -m venv venv
-source venv/bin/activate
-pip install --upgrade pip
-pip install Flask Flask-SQLAlchemy mysql-connector-python pandas numpy scikit-learn selenium webdriver-manager python-dotenv Authlib requests openpyxl
-pip install pymysql
+step 1
+masuk ke vpc mengunakan ssh
+ssh root@alamat_ip_vps
 
-ssh
-instal docker 
+step 2
+ instal docker dan docker compose
+
+step 3 
+instal image mysql 8.0
+buat folder coffeeshop-recommendation file dockerfile dan docker-compose.ylm
+dockerfile :
+FROM python:3.14-slim
+
+# Environment
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Working Directory
+WORKDIR /app
+
+# Install dependency Linux
+RUN apt-get update && apt-get install -y \
+    git \
+    gcc \
+    g++ \
+    build-essential \
+    pkg-config \
+    default-libmysqlclient-dev \
+    chromium \
+    chromium-driver \
+    curl \
+    wget \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Clone Repository
+RUN git clone https://github.com/piyo12052004/coffeeshop-recommendation-frelance.git .
+
+# Membuat requirements.txt
+RUN cat <<'EOF' > requirements.txt
+attrs==26.1.0
+Authlib==1.7.2
+blinker==1.9.0
+certifi==2026.7.22
+cffi==2.1.0
+charset-normalizer==3.4.9
+click==8.4.2
+cryptography==49.0.0
+et_xmlfile==2.0.0
+Flask==3.1.3
+Flask-SQLAlchemy==3.1.1
+h11==0.16.0
+idna==3.18
+itsdangerous==2.2.0
+Jinja2==3.1.6
+joblib==1.5.3
+joserfc==1.7.4
+MarkupSafe==3.0.3
+mysql-connector-python==26.7.0
+narwhals==2.24.0
+numpy==2.5.1
+openpyxl==3.1.5
+outcome==1.3.0.post0
+packaging==26.2
+pandas==3.0.5
+pycparser==3.0
+PyMySQL==1.2.0
+PySocks==1.7.1
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.2
+requests==2.34.2
+scikit-learn==1.9.0
+scipy==1.18.0
+selenium==4.46.0
+six==1.17.0
+sniffio==1.3.1
+sortedcontainers==2.4.0
+SQLAlchemy==2.0.51
+threadpoolctl==3.6.0
+trio==0.33.0
+trio-websocket==0.12.2
+typing_extensions==4.16.0
+urllib3==2.7.0
+webdriver-manager==4.1.2
+websocket-client==1.9.0
+Werkzeug==3.1.8
+wsproto==1.3.2
+EOF
+
+# Upgrade pip
+RUN pip install --upgrade pip
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Expose Flask
+EXPOSE 5000
+
+# Jalankan Flask
+CMD ["python", "app.py"]
+
+docker-compose
+services:
+  coffeeshop-app:
+    container_name: coffeeshop-app
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: coffeeshop-recommendation:latest
+
+    restart: unless-stopped
+
+    ports:
+      - "5000:5000"
+
+    environment:
+      DB_HOST: mysql-aset
+      DB_PORT: 3306
+      DB_DATABASE: coffeeshop_project
+      DB_USERNAME: root
+      DB_PASSWORD: root123
+
+    tty: true
+    stdin_open: true
+
+    networks:
+      - coffeeshop-network
+
+
+networks:
+  coffeeshop-network:
+    driver: bridge
+
+step 4 
+build file dockerfile dan docker-compose
+
+step 5 
+hubungkan network mysql-aset dengan coffeeshop-network agar saling terhubung 
+docker inspect coffeeshop-app --format='{{json .NetworkSettings.Networks}}'
+dan:
+docker inspect mysql-aset --format='{{json .NetworkSettings.Networks}}'
+Pastikan keduanya punya:
+coffeeshop-recommendation_coffeeshop-network
+
+step 6 
+masuk ke mysql-aset mengunakan exec buat database coffeeshop_project dan import database 
+ docker exec -i mysql-aset mysql -u root -proot123 coffeeshop_project < /root/coffeeshop_project.sql
+
+step 7 
+dns
+ 
